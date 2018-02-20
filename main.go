@@ -5,6 +5,7 @@ import "os"
 import "github.com/codegangsta/cli"
 import "time"
 import "strings"
+import "io/ioutil"
 import "math/rand"
 import "path/filepath"
 import "os/exec"
@@ -50,8 +51,23 @@ func AllSrcFiles() []string {
 
 func ImportAction(c *cli.Context) {
 	fileList := AllSrcFiles()
+	hash := make(map[string]bool)
 	for _, file := range fileList {
-		fmt.Println(file)
+		b, err := ioutil.ReadFile(file)
+		if err == nil {
+			for _, line := range strings.Split(string(b), "\n") {
+				trimmed := strings.TrimSpace(line)
+				if strings.Contains(trimmed, "import ") {
+					if strings.HasSuffix(trimmed, ";") {
+						trimmed = trimmed[0 : len(trimmed)-1]
+					}
+					hash[trimmed] = true
+				}
+			}
+		}
+	}
+	for k, _ := range hash {
+		fmt.Println(k)
 	}
 }
 
