@@ -73,7 +73,7 @@ func ImportAction(c *cli.Context) {
 		}
 	}
 
-	path := FindJustOne(query)
+	path := FindJustOne(strings.ToLower(query))
 	if path == "" {
 		return
 	}
@@ -97,10 +97,17 @@ func ImportAction(c *cli.Context) {
 			replaced = strings.Replace(replaced, ">", " ", -1)
 			for last, v := range lasts {
 				tokens := strings.Split(replaced, " ")
-				for _, t := range tokens {
-					if t == last {
-						for _, l := range v {
-							imports[l] = true
+				trimmedToken0 := strings.TrimSpace(tokens[0])
+				trimmedToken1 := ""
+				if len(tokens) > 1 {
+					trimmedToken1 = strings.TrimSpace(tokens[1])
+				}
+				if trimmedToken0 != "class" && trimmedToken1 != "class" {
+					for _, t := range tokens {
+						if t == last {
+							for _, l := range v {
+								imports[l] = true
+							}
 						}
 					}
 				}
@@ -139,7 +146,7 @@ func FindJustOne(query string) string {
 
 func VimAction(c *cli.Context) {
 	query := c.Args().Get(0)
-	path := FindJustOne(query)
+	path := FindJustOne(strings.ToLower(query))
 	if path == "" {
 		return
 	}
