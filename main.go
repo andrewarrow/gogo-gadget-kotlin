@@ -18,12 +18,9 @@ func main() {
 	app.Usage = "change kotlin code from command line and avoid using an IDE "
 	app.Version = "0.1.1"
 	app.Commands = []cli.Command{
-		{Name: "import", ShortName: "i",
+		{Name: "import", ShortName: "i query",
 			Usage: "fix all your imports", Action: ImportAction},
-		{Name: "vim", ShortName: "v", Usage: "open in vim",
-			Flags: []cli.Flag{
-				cli.StringFlag{Name: "query", Value: "Resource", Usage: "match"},
-			},
+		{Name: "vim", ShortName: "v", Usage: "vim query",
 			Action: VimAction},
 	}
 
@@ -50,6 +47,7 @@ func AllSrcFiles() []string {
 }
 
 func ImportAction(c *cli.Context) {
+	query := c.Args().Get(0)
 	fileList := AllSrcFiles()
 	hash := make(map[string]bool)
 	for _, file := range fileList {
@@ -66,13 +64,33 @@ func ImportAction(c *cli.Context) {
 			}
 		}
 	}
+	lasts := make(map[string]string)
 	for k, _ := range hash {
-		fmt.Println(k)
+		tokens := strings.Split(k, ".")
+		last := tokens[len(tokens)-1]
+		if last != "*" {
+			lasts[last] = k
+		}
 	}
+
+	path := FindJustOne(query)
+	if path == "" {
+		return
+	}
+	b, err := ioutil.ReadFile(path)
+	if err == nil {
+		for _, line := range strings.Split(string(b), "\n") {
+			for last, v := range lasts {
+				if strings.Contains(line, last) {
+					fmt.Println(v)
+				}
+			}
+		}
+	}
+
 }
 
-func VimAction(c *cli.Context) {
-	query := strings.ToLower(c.String("query"))
+func FindJustOne(query string) string {
 	fileList := AllSrcFiles()
 	fileListMatch := []string{}
 	for _, file := range fileList {
@@ -82,19 +100,27 @@ func VimAction(c *cli.Context) {
 		}
 	}
 	if len(fileListMatch) == 1 {
-		fmt.Println(fileListMatch[0])
-
-		cmd := exec.Command("vim", fileListMatch[0])
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		err := cmd.Run()
-		if err != nil {
-			fmt.Println(err)
-		}
+		return fileListMatch[0]
 	} else {
 		for _, file := range fileListMatch {
 			fmt.Println(file)
 		}
+	}
+	return ""
+}
+
+func VimAction(c *cli.Context) {
+	query := c.Args().Get(0)
+	path := FindJustOne(query)
+	if path == "" {
+		return
+	}
+	cmd := exec.Command("vim", path)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
 	}
 
 }
