@@ -87,7 +87,7 @@ func ImportAction(c *cli.Context) {
 			if strings.Contains(trimmed, "package ") {
 				continue
 			}
-			replaced := strings.Replace(line, "@", " ", -1)
+			replaced := strings.Replace(trimmed, "@", " ", -1)
 			replaced = strings.Replace(replaced, "(", " ", -1)
 			replaced = strings.Replace(replaced, ".", " ", -1)
 			replaced = strings.Replace(replaced, ":", " ", -1)
@@ -95,19 +95,21 @@ func ImportAction(c *cli.Context) {
 			replaced = strings.Replace(replaced, ",", " ", -1)
 			replaced = strings.Replace(replaced, "<", " ", -1)
 			replaced = strings.Replace(replaced, ">", " ", -1)
+			tokens := strings.Split(replaced, " ")
+			t0 := strings.TrimSpace(tokens[0])
+			t1 := ""
+			if len(tokens) > 1 {
+				t1 = strings.TrimSpace(tokens[1])
+			}
+			if t0 == "class" || t1 == "class" {
+				continue
+			}
+
 			for last, v := range lasts {
-				tokens := strings.Split(replaced, " ")
-				trimmedToken0 := strings.TrimSpace(tokens[0])
-				trimmedToken1 := ""
-				if len(tokens) > 1 {
-					trimmedToken1 = strings.TrimSpace(tokens[1])
-				}
-				if trimmedToken0 != "class" && trimmedToken1 != "class" {
-					for _, t := range tokens {
-						if t == last {
-							for _, l := range v {
-								imports[l] = true
-							}
+				for _, t := range tokens {
+					if t == last {
+						for _, l := range v {
+							imports[l] = true
 						}
 					}
 				}
