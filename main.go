@@ -18,10 +18,8 @@ func main() {
 	app.Usage = "change kotlin code from command line and avoid using an IDE "
 	app.Version = "0.1.1"
 	app.Commands = []cli.Command{
-		{Name: "import", ShortName: "i query",
-			Usage: "fix all your imports", Action: ImportAction},
-		{Name: "vim", ShortName: "v", Usage: "vim query",
-			Action: VimAction},
+		{Name: "import", ShortName: "i", Usage: "import query", Action: ImportAction},
+		{Name: "vim", ShortName: "v", Usage: "vim query", Action: VimAction},
 	}
 
 	app.Run(os.Args)
@@ -80,9 +78,24 @@ func ImportAction(c *cli.Context) {
 	b, err := ioutil.ReadFile(path)
 	if err == nil {
 		for _, line := range strings.Split(string(b), "\n") {
+			trimmed := strings.TrimSpace(line)
+			if strings.Contains(trimmed, "import ") {
+				continue
+			}
+			if strings.Contains(trimmed, "package ") {
+				continue
+			}
+			replaced := strings.Replace(line, "@", " ", -1)
+			replaced = strings.Replace(replaced, "(", " ", -1)
+			replaced = strings.Replace(replaced, ".", " ", -1)
+			replaced = strings.Replace(replaced, ":", " ", -1)
+			replaced = strings.Replace(replaced, "?", " ", -1)
+			replaced = strings.Replace(replaced, ",", " ", -1)
+			replaced = strings.Replace(replaced, "<", " ", -1)
+			replaced = strings.Replace(replaced, ">", " ", -1)
+			fmt.Println(replaced)
 			for last, v := range lasts {
-				if strings.Contains(line, last) {
-					fmt.Println(v)
+				if last == "" && v == "" {
 				}
 			}
 		}
