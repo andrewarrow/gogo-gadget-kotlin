@@ -64,7 +64,7 @@ func ImportAction(c *cli.Context) {
 		}
 	}
 	lasts := make(map[string][]string)
-	imports := make(map[string]bool)
+	imports := make(map[string]string)
 	for k, _ := range hash {
 		tokens := strings.Split(k, ".")
 		last := tokens[len(tokens)-1]
@@ -77,6 +77,7 @@ func ImportAction(c *cli.Context) {
 	if path == "" {
 		return
 	}
+	blackList := make(map[string]bool)
 	b, err := ioutil.ReadFile(path)
 	if err == nil {
 		for _, line := range strings.Split(string(b), "\n") {
@@ -101,7 +102,12 @@ func ImportAction(c *cli.Context) {
 			if len(tokens) > 1 {
 				t1 = strings.TrimSpace(tokens[1])
 			}
-			if t0 == "class" || t1 == "class" {
+			if t0 == "class" {
+				blackList[t1] = true
+				continue
+			}
+			if t1 == "class" {
+				blackList[strings.TrimSpace(tokens[2])] = true
 				continue
 			}
 
@@ -109,7 +115,7 @@ func ImportAction(c *cli.Context) {
 				for _, t := range tokens {
 					if t == last {
 						for _, l := range v {
-							imports[l] = true
+							imports[l] = last
 						}
 					}
 				}
@@ -118,7 +124,11 @@ func ImportAction(c *cli.Context) {
 	}
 	var keys []string
 	for k, _ := range imports {
-		keys = append(keys, k)
+		tokens := strings.Split(k, ".")
+		last := tokens[len(tokens)-1]
+		if blackList[last] == false {
+			keys = append(keys, k)
+		}
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
