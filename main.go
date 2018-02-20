@@ -4,8 +4,10 @@ import "fmt"
 import "os"
 import "github.com/codegangsta/cli"
 import "time"
+import "strings"
 import "math/rand"
 import "path/filepath"
+import "os/exec"
 
 func main() {
 
@@ -54,11 +56,29 @@ func ImportAction(c *cli.Context) {
 }
 
 func VimAction(c *cli.Context) {
-	query := c.String("query")
-	fmt.Println(query)
+	query := strings.ToLower(c.String("query"))
 	fileList := AllSrcFiles()
+	fileListMatch := []string{}
 	for _, file := range fileList {
-		fmt.Println(file)
+		lower := strings.ToLower(file)
+		if strings.Contains(lower, query) {
+			fileListMatch = append(fileListMatch, file)
+		}
+	}
+	if len(fileListMatch) == 1 {
+		fmt.Println(fileListMatch[0])
+
+		cmd := exec.Command("vim", fileListMatch[0])
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		for _, file := range fileListMatch {
+			fmt.Println(file)
+		}
 	}
 
 }
