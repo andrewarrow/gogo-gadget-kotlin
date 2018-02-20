@@ -7,6 +7,7 @@ import "time"
 import "strings"
 import "io/ioutil"
 import "math/rand"
+import "sort"
 import "path/filepath"
 import "os/exec"
 
@@ -63,6 +64,7 @@ func ImportAction(c *cli.Context) {
 		}
 	}
 	lasts := make(map[string]string)
+	imports := make(map[string]bool)
 	for k, _ := range hash {
 		tokens := strings.Split(k, ".")
 		last := tokens[len(tokens)-1]
@@ -93,12 +95,23 @@ func ImportAction(c *cli.Context) {
 			replaced = strings.Replace(replaced, ",", " ", -1)
 			replaced = strings.Replace(replaced, "<", " ", -1)
 			replaced = strings.Replace(replaced, ">", " ", -1)
-			fmt.Println(replaced)
 			for last, v := range lasts {
-				if last == "" && v == "" {
+				tokens := strings.Split(replaced, " ")
+				for _, t := range tokens {
+					if t == last {
+						imports[v] = true
+					}
 				}
 			}
 		}
+	}
+	var keys []string
+	for k, _ := range imports {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println(k)
 	}
 
 }
