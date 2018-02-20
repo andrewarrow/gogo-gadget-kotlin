@@ -63,13 +63,13 @@ func ImportAction(c *cli.Context) {
 			}
 		}
 	}
-	lasts := make(map[string]string)
+	lasts := make(map[string][]string)
 	imports := make(map[string]bool)
 	for k, _ := range hash {
 		tokens := strings.Split(k, ".")
 		last := tokens[len(tokens)-1]
 		if last != "*" {
-			lasts[last] = k
+			lasts[last] = append(lasts[last], k)
 		}
 	}
 
@@ -99,7 +99,9 @@ func ImportAction(c *cli.Context) {
 				tokens := strings.Split(replaced, " ")
 				for _, t := range tokens {
 					if t == last {
-						imports[v] = true
+						for _, l := range v {
+							imports[l] = true
+						}
 					}
 				}
 			}
