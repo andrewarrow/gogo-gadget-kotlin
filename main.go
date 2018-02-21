@@ -131,9 +131,35 @@ func ImportAction(c *cli.Context) {
 		}
 	}
 	sort.Strings(keys)
-	for _, k := range keys {
-		fmt.Println(k)
+	buffer := []string{}
+	b, _ = ioutil.ReadFile(path)
+	for _, line := range strings.Split(string(b), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.Contains(trimmed, "package ") {
+			buffer = append(buffer, trimmed)
+		}
+		if strings.Contains(trimmed, "import ") {
+			break
+		}
 	}
+	buffer = append(buffer, "")
+	for _, k := range keys {
+		buffer = append(buffer, k)
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.Contains(trimmed, "package ") {
+			continue
+		}
+		if strings.Contains(trimmed, "import ") {
+			continue
+		}
+		buffer = append(buffer, trimmed)
+	}
+	file := strings.Join(buffer, "\n")
+
+	d1 := []byte(file)
+	ioutil.WriteFile(path, d1, 0644)
 
 }
 
