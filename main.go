@@ -20,10 +20,31 @@ func main() {
 	app.Version = "0.1.1"
 	app.Commands = []cli.Command{
 		{Name: "import", ShortName: "i", Usage: "import query", Action: ImportAction},
+		{Name: "add_item_to_array", ShortName: "a", Usage: "add item to array", Action: AddAction},
 		{Name: "vim", ShortName: "v", Usage: "vim query", Action: VimAction},
 	}
 
 	app.Run(os.Args)
+}
+
+func AddAction(c *cli.Context) {
+	//	query := c.Args().Get(0)
+	fileList := AllSrcFiles()
+	for _, file := range fileList {
+		b, err := ioutil.ReadFile(file)
+		if err == nil {
+			for _, line := range strings.Split(string(b), "\n") {
+				trimmed := strings.TrimSpace(line)
+				if strings.Contains(trimmed, "@RolesAllowed(\"") {
+					fmt.Println(trimmed)
+					tokens := strings.Split(trimmed, "RolesAllowed")
+					more := tokens[1]
+					evenMore := strings.Split(more[1:len(more)-1], ",")
+					fmt.Println(evenMore)
+				}
+			}
+		}
+	}
 }
 
 func AllSrcFiles() []string {
