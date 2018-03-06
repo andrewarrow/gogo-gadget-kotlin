@@ -36,11 +36,17 @@ func AddAction(c *cli.Context) {
 			for _, line := range strings.Split(string(b), "\n") {
 				trimmed := strings.TrimSpace(line)
 				if strings.Contains(trimmed, "@RolesAllowed(\"") {
-					fmt.Println(trimmed)
 					tokens := strings.Split(trimmed, "RolesAllowed")
 					more := tokens[1]
 					evenMore := strings.Split(more[1:len(more)-1], ",")
-					fmt.Println(evenMore)
+					roles := map[string]int{}
+					for _, em := range evenMore {
+						key := strings.TrimSpace(em)
+						roles[key[1:len(key)-1]] = 1
+					}
+					if roles["admin"] == 1 {
+						fmt.Println(line)
+					}
 				}
 			}
 		}
