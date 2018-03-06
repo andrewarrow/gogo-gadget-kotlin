@@ -28,7 +28,7 @@ func main() {
 }
 
 func AddAction(c *cli.Context) {
-	//	query := c.Args().Get(0)
+	role := c.Args().Get(0)
 	fileList := AllSrcFiles()
 	for _, file := range fileList {
 		b, err := ioutil.ReadFile(file)
@@ -40,12 +40,17 @@ func AddAction(c *cli.Context) {
 					more := tokens[1]
 					evenMore := strings.Split(more[1:len(more)-1], ",")
 					roles := map[string]int{}
+					fixed := []string{}
 					for _, em := range evenMore {
 						key := strings.TrimSpace(em)
-						roles[key[1:len(key)-1]] = 1
+						name := key[1 : len(key)-1]
+						fixed = append(fixed, key)
+						roles[name] = 1
 					}
 					if roles["admin"] == 1 {
-						fmt.Println(line)
+						fixed = append(fixed, "\""+role+"\"")
+						newline := fmt.Sprintf("@RolesAllowed(%s)", strings.Join(fixed, ","))
+						fmt.Println(newline)
 					}
 				}
 			}
