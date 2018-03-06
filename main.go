@@ -27,34 +27,46 @@ func main() {
 	app.Run(os.Args)
 }
 
+func WriteLine() {
+}
 func AddAction(c *cli.Context) {
 	role := c.Args().Get(0)
 	fileList := AllSrcFiles()
 	for _, file := range fileList {
 		b, err := ioutil.ReadFile(file)
-		if err == nil {
-			for _, line := range strings.Split(string(b), "\n") {
-				trimmed := strings.TrimSpace(line)
-				if strings.Contains(trimmed, "@RolesAllowed(\"") {
-					tokens := strings.Split(trimmed, "RolesAllowed")
-					more := tokens[1]
-					evenMore := strings.Split(more[1:len(more)-1], ",")
-					roles := map[string]int{}
-					fixed := []string{}
-					for _, em := range evenMore {
-						key := strings.TrimSpace(em)
-						name := key[1 : len(key)-1]
-						fixed = append(fixed, key)
-						roles[name] = 1
-					}
-					if roles["admin"] == 1 {
-						fixed = append(fixed, "\""+role+"\"")
-						newline := fmt.Sprintf("@RolesAllowed(%s)", strings.Join(fixed, ","))
-						fmt.Println(newline)
-					}
+		if err != nil {
+			continue
+		}
+		buffer := []string{}
+		for _, line := range strings.Split(string(b), "\n") {
+			trimmed := strings.TrimSpace(line)
+			if strings.Contains(trimmed, "@RolesAllowed(\"") {
+				tokens := strings.Split(trimmed, "RolesAllowed")
+				more := tokens[1]
+				evenMore := strings.Split(more[1:len(more)-1], ",")
+				roles := map[string]int{}
+				fixed := []string{}
+				for _, em := range evenMore {
+					key := strings.TrimSpace(em)
+					name := key[1 : len(key)-1]
+					fixed = append(fixed, key)
+					roles[name] = 1
 				}
+				if roles["admin"] == 1 {
+					fixed = append(fixed, "\""+role+"\"")
+					newline := fmt.Sprintf("  @RolesAllowed(%s)", strings.Join(fixed, ","))
+					fmt.Println(newline)
+					buffer = append(buffer, newline)
+				} else {
+					buffer = append(buffer, line)
+				}
+			} else {
+				buffer = append(buffer, line)
 			}
 		}
+		newcon := strings.Join(buffer, "\n")
+		d1 := []byte(newcon)
+		ioutil.WriteFile(file, d1, 0644)
 	}
 }
 
