@@ -30,7 +30,7 @@ func main() {
 func WriteLine() {
 }
 func AddAction(c *cli.Context) {
-	role := c.Args().Get(0)
+	//role := c.Args().Get(0)
 	fileList := AllSrcFiles()
 	for _, file := range fileList {
 		b, err := ioutil.ReadFile(file)
@@ -49,11 +49,12 @@ func AddAction(c *cli.Context) {
 				for _, em := range evenMore {
 					key := strings.TrimSpace(em)
 					name := key[1 : len(key)-1]
-					fixed = append(fixed, key)
+					fixed = append(fixed, "Role."+strings.ToUpper(name))
 					roles[name] = 1
 				}
-				if roles["admin"] == 1 {
-					fixed = append(fixed, "\""+role+"\"")
+				if true {
+					//@RolesAllowed(Role.TECHNICIAN, Role.MANAGER, Role.LAUNCHER, Role.SUPPORT)
+					//  @RolesAllowed("superuser","admin","support","manager","test")
 					newline := fmt.Sprintf("  @RolesAllowed(%s)", strings.Join(fixed, ","))
 					fmt.Println(newline)
 					buffer = append(buffer, newline)
