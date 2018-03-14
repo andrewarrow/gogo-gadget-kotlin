@@ -136,4 +136,8 @@ class %sResource @Inject constructor(
 		 ): %s = %sManager.create%s(body.to%s())
 	 }
 		`
+	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, n, model, model, model, model, n, model, model)
+	d1 = []byte(resfile)
+	ioutil.WriteFile(fmt.Sprintf("scb/resource/%sResource.kt", model), d1, 0644)
+
 }
