@@ -105,4 +105,35 @@ class %sManagerImpl(
 	manfile := fmt.Sprintf(man_template, prefix, prefix, model, prefix, model, model, model, model, model, n, model, model, model, model, n)
 	d1 = []byte(manfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/manager/%sManager.kt", model), d1, 0644)
+
+	res_template := `package %.resource
+
+import %s.core.%sManager
+import %s.model.%s
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.newrelic.api.agent.Trace
+import io.dropwizard.auth.Auth
+import javax.inject.Inject
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
+import javax.ws.rs.POST
+import javax.ws.rs.GET
+import javax.ws.rs.PUT
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
+
+@Path("/%s")
+@Produces(MediaType.APPLICATION_JSON)
+class %sResource @Inject constructor(
+  private val %sManager: %sManager
+): Logging {
+
+  @Trace(dispatcher = true)
+  @POST
+  fun create%s(
+    @Valid @NotNull body: Create%sBody
+		 ): %s = %sManager.create%s(body.to%s())
+	 }
+		`
 }
