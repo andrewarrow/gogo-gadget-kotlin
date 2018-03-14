@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 import "github.com/codegangsta/cli"
+import "strings"
 import "io/ioutil"
 
 func TableAction(c *cli.Context) {
@@ -77,4 +78,31 @@ class %sRepositoryImpl @Inject constructor(
 	repofile := fmt.Sprintf(repo_template, prefix, prefix, prefix, model, model, model, model, model, model, model, model, model)
 	d1 = []byte(repofile)
 	ioutil.WriteFile(fmt.Sprintf("scb/repository/%sRepository.kt", model), d1, 0644)
+
+	man_template := `package %s.core
+
+import %s.model.%s
+import %s.repository.%sRepository
+import org.postgis.Point
+import java.time.OffsetDateTime
+import java.util.UUID
+
+interface %sManager {
+  fun insert(thing: %s): %s
+}
+
+class %sManagerImpl(
+  private val %sRepository: %sRepository
+): %sManager {
+
+  override fun insert(thing: %s): %s {
+    %sRepository.insert(thing)
+	}
+}
+
+	`
+	n := strings.Split(table, "_")[0]
+	manfile := fmt.Sprintf(man_template, prefix, prefix, model, prefix, model, model, model, model, model, n, model, model, model, model, n)
+	d1 = []byte(manfile)
+	ioutil.WriteFile(fmt.Sprintf("scb/manager/%sManager.kt", model), d1, 0644)
 }
