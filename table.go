@@ -135,8 +135,17 @@ class %sResource @Inject constructor(
     @Valid @NotNull body: Create%sBody
 		 ): %s = %sManager.create%s(body.to%s())
 	 }
+	 
+data class Create%sBody(
+  val otherId: UUID,
+  val thing: String? = null
+) {
+  fun to%s(): %s = %s(
+    otherId = otherId
+  )
+}
 		`
-	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, model, n, model, model, model, model, n, model, model)
+	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, model, n, model, model, model, model, n, model, model, model, model, model, model)
 	d1 = []byte(resfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/resource/%sResource.kt", model), d1, 0644)
 
