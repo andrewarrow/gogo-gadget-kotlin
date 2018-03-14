@@ -45,4 +45,36 @@ func TableAction(c *cli.Context) {
 	modelfile := fmt.Sprintf(model_template, prefix, table, model)
 	d1 = []byte(modelfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/model/%s.kt", model), d1, 0644)
+
+	repo_template := `package %s.repository
+
+import %s.core.DatabaseManager
+import %s.model.%s
+import org.postgis.Geometry
+import org.postgis.Point
+import java.time.OffsetDateTime
+import java.util.UUID
+import javax.inject.Inject
+
+interface %sRepository {
+  fun insert(thing: %s): %s
+}
+
+class %sRepositoryImpl @Inject constructor(
+  private val db: DatabaseManager
+) : %sRepository {
+
+  override fun insert(thing: %s): %s {
+    %s::class.insert()
+      .values(thing)
+      .generate(db.dialect)
+      .execute(db.primary)
+    return thing
+  }
+}
+	`
+
+	repofile := fmt.Sprintf(repo_template, prefix, prefix, prefix, model, model, model, model, model, model, model, model, model)
+	d1 = []byte(repofile)
+	ioutil.WriteFile(fmt.Sprintf("scb/repository/%sRepository.kt", model), d1, 0644)
 }
