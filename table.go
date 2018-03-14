@@ -106,7 +106,7 @@ class %sManagerImpl(
 	d1 = []byte(manfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/manager/%sManager.kt", model), d1, 0644)
 
-	res_template := `package %.resource
+	res_template := `package %s.resource
 
 import %s.core.%sManager
 import %s.model.%s
@@ -136,7 +136,7 @@ class %sResource @Inject constructor(
 		 ): %s = %sManager.create%s(body.to%s())
 	 }
 		`
-	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, n, model, model, model, model, n, model, model)
+	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, model, n, model, model, model, model, n, model, model)
 	d1 = []byte(resfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/resource/%sResource.kt", model), d1, 0644)
 
