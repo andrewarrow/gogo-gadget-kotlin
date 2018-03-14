@@ -21,6 +21,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{Name: "import", ShortName: "i", Usage: "import query", Action: ImportAction},
 		{Name: "add_item_to_array", ShortName: "a", Usage: "add item to array", Action: AddAction},
+		{Name: "new_table", ShortName: "t", Usage: "add new table", Action: TableAction},
 		{Name: "vim", ShortName: "v", Usage: "vim query", Action: VimAction},
 	}
 
