@@ -59,6 +59,7 @@ import javax.inject.Inject
 
 interface %sRepository {
   fun insert(thing: %s): %s
+	fun byUser(userId: UUID): List<%s>
 }
 
 class %sRepositoryImpl @Inject constructor(
@@ -72,6 +73,9 @@ class %sRepositoryImpl @Inject constructor(
       .execute(db.primary)
     return thing
   }
+	overrride fun byUser(userId: UUID): List<%s> {
+		%sRepository.get(userId)
+	}
 }
 	`
 
@@ -89,6 +93,7 @@ import java.util.UUID
 
 interface %sManager {
   fun insert(thing: %s): %s
+	fun byUser(userId: UUID): List<%s>
 }
 
 class %sManagerImpl(
@@ -97,6 +102,9 @@ class %sManagerImpl(
 
   override fun insert(thing: %s): %s {
     %sRepository.insert(thing)
+	}
+	overrride fun byUser(userId: UUID): List<%s> {
+		%sRepository.get(userId)
 	}
 }
 
@@ -135,6 +143,12 @@ class %sResource @Inject constructor(
     @Valid @NotNull body: Create%sBody
 		 ): %s = %sManager.create%s(body.to%s())
 	 }
+
+  @Trace(dispatcher = true)
+  @GET
+  fun get%s(
+    @Auth principal: UserPrincipal,
+  ): List<%s> = %sManager.get%s(principal.user_id)
 	 
 data class Create%sBody(
   val otherId: UUID,
