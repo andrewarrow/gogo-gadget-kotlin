@@ -75,7 +75,7 @@ class %sRepositoryImpl @Inject constructor(
   }
 	overrride fun byUser(userId: UUID): List<%s> {
 	  return %s::class.selectAll()
-      .where(Issue::userId eq userId)
+      .where(%s::userId eq userId)
       .generate(db.dialect)
       .query(db.primary)
 	}
@@ -85,7 +85,7 @@ class %sRepositoryImpl @Inject constructor(
 	repofile := fmt.Sprintf(repo_template,
 		prefix, prefix, prefix,
 		model, model, model, model, model,
-		model, model, model, model, model, model, model)
+		model, model, model, model, model, model, model, model)
 
 	d1 = []byte(repofile)
 	ioutil.WriteFile(fmt.Sprintf("scb/repository/%sRepository.kt", model), d1, 0644)
