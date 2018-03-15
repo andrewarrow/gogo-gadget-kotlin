@@ -122,7 +122,7 @@ class %sManagerImpl(
 		model, model, n, model, model,
 		model, model, n, model, n)
 	d1 = []byte(manfile)
-	ioutil.WriteFile(fmt.Sprintf("scb/manager/%sManager.kt", model), d1, 0644)
+	ioutil.WriteFile(fmt.Sprintf("scb/core/%sManager.kt", model), d1, 0644)
 
 	res_template := `package %s.resource
 
