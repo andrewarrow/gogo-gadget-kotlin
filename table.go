@@ -120,7 +120,7 @@ class %sManagerImpl(
 	manfile := fmt.Sprintf(man_template, prefix, prefix, model,
 		prefix, model, model, model,
 		model, model, n, model, model,
-		model, model, n, model, model, n)
+		model, model, model, n, model, n)
 	d1 = []byte(manfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/core/%sManager.kt", model), d1, 0644)
 
