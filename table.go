@@ -74,12 +74,19 @@ class %sRepositoryImpl @Inject constructor(
     return thing
   }
 	overrride fun byUser(userId: UUID): List<%s> {
-		%sRepository.get(userId)
+	  return %s::class.selectAll()
+      .where(Issue::userId eq userId)
+      .generate(db.dialect)
+      .query(db.primary)
 	}
 }
 	`
 
-	repofile := fmt.Sprintf(repo_template, prefix, prefix, prefix, model, model, model, model, model, model, model, model, model)
+	repofile := fmt.Sprintf(repo_template,
+		prefix, prefix, prefix,
+		model, model, model, model, model,
+		model, model, model, model, model, model, model)
+
 	d1 = []byte(repofile)
 	ioutil.WriteFile(fmt.Sprintf("scb/repository/%sRepository.kt", model), d1, 0644)
 
@@ -110,7 +117,10 @@ class %sManagerImpl(
 
 	`
 	n := strings.Split(table, "_")[0]
-	manfile := fmt.Sprintf(man_template, prefix, prefix, model, prefix, model, model, model, model, model, n, model, model, model, model, n)
+	manfile := fmt.Sprintf(man_template, prefix, prefix, model,
+		prefix, model, model, model,
+		model, model, n, model, model,
+		model, model, n, model, n)
 	d1 = []byte(manfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/manager/%sManager.kt", model), d1, 0644)
 
