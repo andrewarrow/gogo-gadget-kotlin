@@ -169,7 +169,12 @@ data class Create%sBody(
   )
 }
 		`
-	resfile := fmt.Sprintf(res_template, prefix, prefix, model, prefix, model, table, model, n, model, model, model, model, n, model, model, model, model, model, model)
+	resfile := fmt.Sprintf(res_template, prefix, prefix, model,
+		prefix, model, table, model,
+		n, model, model, model,
+		model, n, model, model,
+		model, model, n, model,
+		model, model, model, model)
 	d1 = []byte(resfile)
 	ioutil.WriteFile(fmt.Sprintf("scb/resource/%sResource.kt", model), d1, 0644)
 
