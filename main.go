@@ -21,6 +21,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{Name: "import", ShortName: "i", Usage: "import query", Action: ImportAction},
 		{Name: "add_item_to_array", ShortName: "a", Usage: "add item to array", Action: AddAction},
+		{Name: "new col", ShortName: "c", Usage: "new col", Action: ColAction},
 		{Name: "vim", ShortName: "v", Usage: "vim query", Action: VimAction},
 	}
 
@@ -28,6 +29,14 @@ func main() {
 }
 
 func WriteLine() {
+}
+func ColAction(c *cli.Context) {
+	table := c.Args().Get(0)
+	col := c.Args().Get(1)
+	filename := fmt.Sprintf("%s-%s-add-col.sql", table, col)
+	data := fmt.Sprintf("ALTER TABLE ONLY %s ADD COLUMN %s text;", table, col)
+	d1 := []byte(data)
+	ioutil.WriteFile("sql/999-"+filename, d1, 0644)
 }
 func AddAction(c *cli.Context) {
 	role := c.Args().Get(0)
@@ -40,8 +49,9 @@ func AddAction(c *cli.Context) {
 		buffer := []string{}
 		for _, line := range strings.Split(string(b), "\n") {
 			trimmed := strings.TrimSpace(line)
-			if strings.Contains(trimmed, "@RolesAllowed(\"") {
+			if strings.Contains(trimmed, "@RolesAllowed(") {
 				tokens := strings.Split(trimmed, "RolesAllowed")
+				fmt.Println(tokens)
 				more := tokens[1]
 				evenMore := strings.Split(more[1:len(more)-1], ",")
 				roles := map[string]int{}
@@ -75,7 +85,6 @@ func AllSrcFiles() []string {
 	if err != nil {
 		fmt.Println(err)
 	}
-	//fmt.Println(dir)
 
 	fileList := []string{}
 	err = filepath.Walk(dir+"/src", func(path string, f os.FileInfo, err error) error {
